@@ -15,8 +15,8 @@ float luma(vec3 color)
 
 vec3 getSkyColor(float daytime, vec2 position)
 {
-    return mix(vec3(texture(iChannel0, vec2(daytime, 0.))),
-               vec3(texture(iChannel0, vec2(daytime,  2. / iChannelResolution[0].y))),
+    return mix(vec3(texture(iChannel0, vec2(daytime, 1. / iChannelResolution[0].y))),
+               vec3(texture(iChannel0, vec2(daytime, 0.))),
                distance(position, vec2(0.5, 0.0)) - (0.2 * position.y));
 }
 
