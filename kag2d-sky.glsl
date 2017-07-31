@@ -20,24 +20,29 @@ vec3 getSkyColor(float daytime, vec2 position)
                distance(position, vec2(0.5, 0.0)) * 1.5 * position.y);
 }
 
-vec3 getStarColor(vec2 position, vec3 noise)
+vec4 getStarColor(vec2 position, vec4 noise)
 {
     if (rand(position * noise.r) > 0.998) // HACK: * noise.r to work around rand()'s precision
     {
-        vec3 randomcoloroff = vec3(noise.r / 9., noise.g / 6., noise.b / 9.);
-        return rand(iTime * position) * 0.15 + vec3(0.7) - randomcoloroff;
+        vec4 basecolor = vec4(vec3(0.9), 1.0);
+        vec4 randomcoloroff = vec4(noise.r / 7., noise.g / 4., noise.b / 7., noise.a);
+        float blink = rand(iTime * position) * 0.1;
+        return basecolor - blink - randomcoloroff;
     }
 
-    return vec3(0);
+    return vec4(0.);
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
+    float daytime = iMouse.x / iResolution.x;
+    
     vec2 position = fragCoord.xy / iResolution.xy;
-    vec3 noise = vec3(texture(iChannel1, fragCoord / iChannelResolution[1].xy));
+    vec4 noise = texture(iChannel1, fragCoord / iChannelResolution[1].xy);
 
-    vec3 skycolor = getSkyColor(iMouse.x / iResolution.x, position);
-    vec3 starcolor = getStarColor(position, noise);
-
-    fragColor = vec4(max(starcolor - luma(skycolor), dither(skycolor, noise.b)), 0);
+    vec3 skycolor = getSkyColor(daytime, position);
+    vec4 starcolor = getStarColor(position, noise);
+	vec3 starcolorblend = mix(skycolor, starcolor.rgb, starcolor.a);
+    
+    fragColor = vec4(max(starcolorblend, dither(skycolor, noise.b)), 1.);
 }
