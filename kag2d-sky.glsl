@@ -15,16 +15,16 @@ float luma(vec3 color)
 
 vec3 getSkyColor(float daytime, vec2 position)
 {
-    return mix(vec3(texture(iChannel0, vec2(daytime, 2. / iChannelResolution[0].y))),
-               vec3(texture(iChannel0, vec2(daytime, 0))),
-               distance(position, vec2(0.5, 0.0)) * 1.5 * position.y);
+    return mix(vec3(texture(iChannel0, vec2(daytime, 0.))),
+               vec3(texture(iChannel0, vec2(daytime,  2. / iChannelResolution[0].y))),
+               distance(position, vec2(0.5, 0.0)) - (0.2 * position.y));
 }
 
 vec4 getStarColor(vec2 position, vec4 noise)
 {
     if (rand(position * noise.r) > 0.998) // HACK: * noise.r to work around rand()'s precision
     {
-        vec4 basecolor = vec4(vec3(0.9), 1.0);
+        vec4 basecolor = vec4(vec3(0.85), 1.0);
         vec4 randomcoloroff = vec4(noise.r / 7., noise.g / 4., noise.b / 7., noise.a);
         float blink = rand(iTime * position) * 0.1;
         return basecolor - blink - randomcoloroff;
@@ -36,6 +36,7 @@ vec4 getStarColor(vec2 position, vec4 noise)
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     float daytime = iMouse.x / iResolution.x;
+    vec2 staroff = vec2(0., daytime / 20.);
     
     vec2 position = fragCoord.xy / iResolution.xy;
     vec4 noise = texture(iChannel1, fragCoord / iChannelResolution[1].xy);
