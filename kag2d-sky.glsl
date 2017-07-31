@@ -36,7 +36,6 @@ vec4 getStarColor(vec2 position, vec4 noise)
 void mainImage(out vec4 fragColor, in vec2 fragCoord)
 {
     float daytime = iMouse.x / iResolution.x;
-    vec2 staroff = vec2(0., daytime / 20.);
     
     vec2 position = fragCoord.xy / iResolution.xy;
     vec4 noise = texture(iChannel1, fragCoord / iChannelResolution[1].xy);
