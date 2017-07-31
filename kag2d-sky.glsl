@@ -13,16 +13,11 @@ float luma(vec3 color)
     return dot(color, vec3(0.299, 0.587, 0.114));
 }
 
-vec3 getSkyColorAt(vec2 texCoord)
-{
-    return vec3(texture(iChannel0, texCoord / iChannelResolution[0].xy));
-}
-
 vec3 getSkyColor(float daytime, vec2 position)
 {
-    return mix(getSkyColorAt(vec2(daytime, 1)),
-               getSkyColorAt(vec2(daytime, 0)),
-              distance(position, vec2(0.5, 0.0)) * 1.5 * position.y);
+    return mix(vec3(texture(iChannel0, vec2(daytime, 2. / iChannelResolution[0].y))),
+               vec3(texture(iChannel0, vec2(daytime, 0))),
+               distance(position, vec2(0.5, 0.0)) * 1.5 * position.y);
 }
 
 vec3 getStarColor(vec2 position, vec3 noise)
@@ -41,7 +36,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord)
     vec2 position = fragCoord.xy / iResolution.xy;
     vec3 noise = vec3(texture(iChannel1, fragCoord / iChannelResolution[1].xy));
 
-    vec3 skycolor = getSkyColor(iTime * 8., position);
+    vec3 skycolor = getSkyColor(iMouse.x / iResolution.x, position);
     vec3 starcolor = getStarColor(position, noise);
 
     fragColor = vec4(max(starcolor - luma(skycolor), dither(skycolor, noise.b)), 0);
